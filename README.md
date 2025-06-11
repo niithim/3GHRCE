@@ -52,5 +52,5 @@ Password: Nithin@123
 
 Database: cms_data (auto-created)
 Run the Project
-test.py
+ python test.py
 
