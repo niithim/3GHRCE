@@ -16,6 +16,14 @@ logger = logging.getLogger(__name__)
 
 # MySQL connection
 def get_mysql_connection():
+
+    """
+    Establishes a connection to the MySQL database. If the database `cms_data` does not exist, it is created.
+
+    Returns:
+        mysql.connector.connection.MySQLConnection: A MySQL connection object if successful, else None.
+    """
+    
     try:
         # First connect without database to create it if needed
         initial_config = {
@@ -61,6 +69,17 @@ def get_mysql_connection():
 
 # Always drop and recreate the table for type safety, all columns as TEXT
 def create_table_if_not_exists(connection, table_name, df):
+
+    """
+    Drops and recreates a table in the specified MySQL database using the schema from the provided DataFrame.
+    All columns are forced to TEXT type.
+
+    Args:
+        connection (mysql.connector.connection.MySQLConnection): MySQL connection object.
+        table_name (str): Name of the table to create.
+        df (pandas.DataFrame): DataFrame whose schema is used to define the table.
+    """
+
     cursor = connection.cursor()
     try:
         database_name = connection.database
@@ -117,6 +136,16 @@ def create_table_if_not_exists(connection, table_name, df):
 
 # Insert dataframe data into MySQL table
 def insert_data_to_mysql(connection, table_name, df):
+
+    """
+    Inserts the data from the DataFrame into the specified MySQL table.
+
+    Args:
+        connection (mysql.connector.connection.MySQLConnection): MySQL connection object.
+        table_name (str): Target table name.
+        df (pandas.DataFrame): DataFrame to insert into the database.
+    """
+
     cursor = connection.cursor()
     try:
         database_name = connection.database
@@ -138,12 +167,34 @@ def insert_data_to_mysql(connection, table_name, df):
 
 # Extract dataset slug from API docs URL
 def extract_slug_from_url(url: str) -> str:
+
+    """
+    Extracts a dataset slug from the API documentation URL.
+
+    Args:
+        url (str): The URL string of the API documentation.
+
+    Returns:
+        str: Dataset slug derived from the URL.
+    """
+
     path = urlparse(url).path
     slug = path.strip("/").split("/")[-2]
     return slug.replace("-", "_")
 
 # Use Playwright to get dataset UUID from api-docs URL
 async def get_dataset_uuid(api_docs_url: str) -> Optional[str]:
+
+    """
+    Uses Playwright to open an API documentation page and extract the dataset UUID from network requests.
+
+    Args:
+        api_docs_url (str): URL of the API documentation.
+
+    Returns:
+        Optional[str]: UUID of the dataset if found, otherwise None.
+    """
+
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True)
         page = await browser.new_page()
@@ -164,6 +215,19 @@ async def get_dataset_uuid(api_docs_url: str) -> Optional[str]:
 
 # Fetch dataset pages via API and combine data
 async def fetch_data(dataset_uuid: str, page_size: int = 5000, max_pages: int = 10) -> Optional[list]:
+
+    """
+    Fetches paginated data for a dataset using its UUID via CMS Data API.
+
+    Args:
+        dataset_uuid (str): UUID of the dataset.
+        page_size (int): Number of records per page.
+        max_pages (int): Maximum number of pages to fetch.
+
+    Returns:
+        Optional[list]: List of records if data is fetched successfully, otherwise None.
+    """
+
     all_data = []
     base_url = f"https://data.cms.gov/data-api/v1/dataset/{dataset_uuid}/data"
     headers = {'Accept': 'application/json', 'User-Agent': 'Mozilla/5.0'}
@@ -190,6 +254,14 @@ async def fetch_data(dataset_uuid: str, page_size: int = 5000, max_pages: int = 
 
 # Process dataset given an api-docs URL
 async def process_dataset(api_docs_url: str):
+
+    """
+    Processes an API-based CMS dataset by extracting data, saving it as CSV, and inserting into MySQL.
+
+    Args:
+        api_docs_url (str): URL of the API documentation for the dataset.
+    """
+
     dataset_slug = extract_slug_from_url(api_docs_url)
     # Special case for "change-of-ownership" dataset
     if "change-of-ownership" in api_docs_url:
@@ -228,6 +300,15 @@ async def process_dataset(api_docs_url: str):
 
 # Process direct CSV dataset from dataset ID (like "4pq5-n9py")
 async def process_direct_csv_dataset(dataset_id: str, dataset_slug: Optional[str] = None):
+
+    """
+    Processes a CMS dataset directly downloadable as CSV using its dataset ID.
+
+    Args:
+        dataset_id (str): ID of the dataset.
+        dataset_slug (Optional[str]): Optional slug to name the output files and tables.
+    """
+
     if not dataset_slug:
         dataset_slug = "provider"
 
@@ -285,6 +366,11 @@ async def process_direct_csv_dataset(dataset_id: str, dataset_slug: Optional[str
 
 # Process state average data
 async def process_state_average_dataset():
+
+    """
+    Processes the state average performance dataset, saving it as CSV and inserting into MySQL.
+
+    """
     dataset_slug = "state_average"
     # Using the correct API endpoint for dataset metadata
     metadata_url = "https://data.cms.gov/provider-data/api/1/metastore/schemas/dataset/items/xcdc-v8bm?show-reference-ids=false"
@@ -341,6 +427,10 @@ async def process_state_average_dataset():
 
 # Main execution function
 async def main():
+
+    """
+    Main execution function to process multiple CMS datasets and store the results in MySQL.
+    """
     api_docs_urls = [
         # 1. SNF All Owners
         "https://data.cms.gov/provider-characteristics/hospitals-and-other-facilities/skilled-nursing-facility-all-owners/api-docs",
