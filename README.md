@@ -1,20 +1,115 @@
- CMS Skilled Nursing Facility Data Pipeline
-This project automates the extraction, transformation, and loading (ETL) of multiple Skilled Nursing Facility (SNF) datasets from the  
-   [CMS (Centers for Medicare & Medicaid Services)] (https://data.cms.gov/) portal. 
-It fetches data from both **API-based** and **CSV-based** datasets, processes them into structured format using Pandas, and stores them into a local MySQL database.
+# CMS Data Processing Tool
 
-Project Structure
+This tool processes and stores CMS (Centers for Medicare & Medicaid Services) datasets, including skilled nursing facility (SNF) data, into both CSV files and MySQL database.
 
-##  Features
+## Features
 
--  Automated UUID extraction using Playwright from Swagger API docs
--  Fetch paginated dataset records via CMS JSON APIs
--  Download and parse CMS-hosted CSV datasets
--  Normalize and rename long columns for MySQL compatibility
--  Create MySQL tables dynamically with correct schema
--  Insert data into MySQL with automatic type conversion
--  Save local CSV backup for each dataset
--  Logging at every step for traceability and debugging
+- Downloads data from multiple CMS datasets
+- Processes various types of SNF (Skilled Nursing Facility) data:
+  - SNF All Owners
+  - SNF Enrollments
+  - SNF Change of Ownership
+  - SNF Entity Performance
+  - SNF Cost Report
+  - SNF Provider Info
+  - State Average Data
+- Saves data in CSV format
+- Stores data in MySQL database
+- Handles asynchronous data processing
+- Includes comprehensive logging
+
+## Prerequisites
+
+- Python 3.8 or higher
+- MySQL Server
+- Git
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/niithim/3GHRCE.git
+cd 3GHRCE
+```
+
+2. Install required Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+3. Install Playwright browsers:
+```bash
+playwright install
+```
+
+4. Set up MySQL:
+- Install MySQL Server
+- Create a database named `cms_data`
+- Default credentials (can be modified in the code):
+  - Username: root
+  - Password: Nithin@123
+  - Host: localhost
+  - Port: 3306
+
+## Usage
+
+Run the main script:
+```bash
+python main.py
+```
+
+The script will:
+1. Download data from CMS datasets
+2. Save CSV files in the `csv` folder
+3. Attempt to store data in MySQL database
+
+## Project Structure
+
+```
+code_repo/
+├── main.py              # Main processing script
+├── requirements.txt     # Python dependencies
+├── csv/                # Directory for CSV files
+│   ├── provider.csv
+│   ├── state_average.csv
+│   └── other_dataset_files.csv
+└── README.md           # This file
+```
+
+## Dependencies
+
+- requests==2.31.0
+- playwright==1.42.0
+- pandas==2.2.1
+- httpx==0.27.0
+- mysql-connector-python==8.3.0
+- asyncio==3.4.3
+- typing-extensions==4.10.0
+
+## Error Handling
+
+The script includes comprehensive error handling and logging:
+- Logs all operations with timestamps
+- Handles API request failures
+- Manages database connection issues
+- Provides detailed error messages
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+Your Name - [@your_twitter](https://twitter.com/your_twitter)
+Project Link: [https://github.com/niithim/3GHRCE](https://github.com/niithim/3GHRCE)
 
 ---
 

@@ -5,7 +5,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def test_mysql_connection():
+def mysql_connection():
     try:
         # Connect to MySQL
         connection = mysql.connector.connect(
@@ -54,4 +54,4 @@ def test_mysql_connection():
             logger.info("\nMySQL connection closed")
 
 if __name__ == "__main__":
-    test_mysql_connection() 
+    mysql_connection() 
